@@ -11,8 +11,14 @@ export class VerificationCode {
   @Column({ length: 100 })
   username: string;
 
+  @Column({ name: 'username_hmac', nullable: true })
+  usernameHmac: string;
+
   @Column({ length: 255 })
   email: string;
+
+  @Column({ name: 'email_hmac', nullable: true })
+  emailHmac: string;
 
   @Column({ name: 'tenant_id' })
   tenantId: number;

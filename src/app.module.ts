@@ -7,12 +7,14 @@ import { VerificationCode } from './modules/verification/entities/verification-c
 import { Usuario } from './modules/usuario/entities/usuario.entity';
 import { Tenant } from './modules/tenant/entities/tenant.entity';
 import { VerificationModule } from './modules/verification/verification.module';
+import { SecurityClientModule } from './common/security/security-client.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    SecurityClientModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
