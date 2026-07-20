@@ -2,8 +2,8 @@ import { Injectable, Logger, NotFoundException, BadRequestException } from '@nes
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationCode } from './entities/verification-code.entity';
-import { Usuario } from '../usuario/entities/usuario.entity';
-import { Tenant } from '../tenant/entities/tenant.entity';
+import { Usuario } from '../shared/entities/usuario.entity';
+import { Tenant } from '../shared/entities/tenant.entity';
 import { MailService } from '../mail/mail.service';
 import { SendCodeDto } from './dto/send-code.dto';
 import { ValidateCodeDto } from './dto/validate-code.dto';

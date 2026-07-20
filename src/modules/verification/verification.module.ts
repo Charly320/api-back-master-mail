@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerificationCodeService } from './verification.service';
 import { VerificationController } from './verification.controller';
 import { VerificationCode } from './entities/verification-code.entity';
-import { Usuario } from '../usuario/entities/usuario.entity';
-import { Tenant } from '../tenant/entities/tenant.entity';
+import { Usuario } from '../shared/entities/usuario.entity';
+import { Tenant } from '../shared/entities/tenant.entity';
 import { MailModule } from '../mail/mail.module';
 
 @Module({

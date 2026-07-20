@@ -12,7 +12,7 @@ export class SecurityClientService {
   private readonly baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl = this.configService.get<string>('SECURITY_API_URL') || 'http://localhost:3010/api/crypto';
+    this.baseUrl = this.configService.get<string>('SECURITY_API_URL') || 'http://localhost:3004/api/crypto';
   }
 
   async encrypt(value: string): Promise<EncryptResponse> {

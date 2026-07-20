@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { VerificationCode } from './modules/verification/entities/verification-code.entity';
-import { Usuario } from './modules/usuario/entities/usuario.entity';
-import { Tenant } from './modules/tenant/entities/tenant.entity';
+import { Usuario } from './modules/shared/entities/usuario.entity';
+import { Tenant } from './modules/shared/entities/tenant.entity';
 import { VerificationModule } from './modules/verification/verification.module';
 import { SecurityClientModule } from './common/security/security-client.module';
 
@@ -32,7 +30,5 @@ import { SecurityClientModule } from './common/security/security-client.module';
     }),
     VerificationModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
