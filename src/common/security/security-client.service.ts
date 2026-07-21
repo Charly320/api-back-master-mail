@@ -12,7 +12,9 @@ export class SecurityClientService {
   private readonly baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl = this.configService.get<string>('SECURITY_API_URL') || 'http://localhost:3004/api/crypto';
+    this.baseUrl =
+      this.configService.get<string>('SECURITY_API_URL') ||
+      'http://localhost:3004/api/crypto';
   }
 
   async encrypt(value: string): Promise<EncryptResponse> {
@@ -23,7 +25,9 @@ export class SecurityClientService {
     });
 
     if (!response.ok) {
-      throw new BadGatewayException('No se pudo encriptar el dato en api-back-core-security.');
+      throw new BadGatewayException(
+        'No se pudo encriptar el dato en api-back-core-security.',
+      );
     }
 
     return (await response.json()) as EncryptResponse;
@@ -37,14 +41,18 @@ export class SecurityClientService {
     });
 
     if (!response.ok) {
-      throw new BadGatewayException('No se pudo desencriptar el dato desde api-back-core-security.');
+      throw new BadGatewayException(
+        'No se pudo desencriptar el dato desde api-back-core-security.',
+      );
     }
 
     const payload = (await response.json()) as { value: string };
     return payload.value;
   }
 
-  async decryptNullable(value: string | null | undefined): Promise<string | null> {
+  async decryptNullable(
+    value: string | null | undefined,
+  ): Promise<string | null> {
     if (!value) {
       return null;
     }
@@ -52,4 +60,3 @@ export class SecurityClientService {
     return this.decrypt(value);
   }
 }
-
