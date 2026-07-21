@@ -7,4 +7,3 @@ import { SecurityClientService } from './security-client.service';
   exports: [SecurityClientService],
 })
 export class SecurityClientModule {}
-

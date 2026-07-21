@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationCode } from './entities/verification-code.entity';
@@ -30,14 +35,21 @@ export class VerificationCodeService {
    */
   async sendVerificationCode(dto: SendCodeDto): Promise<any> {
     const { tenant, username } = dto;
-    this.logger.log(`Processing verification code request for tenant: [${tenant}], user: [${username}]`);
+    this.logger.log(
+      `Processing verification code request for tenant: [${tenant}], user: [${username}]`,
+    );
 
     const tenantEntity = await this.findTenant(tenant);
-    const usuario = await this.findUserByUsernameAndTenant(username, tenantEntity.id);
+    const usuario = await this.findUserByUsernameAndTenant(
+      username,
+      tenantEntity.id,
+    );
 
     const email = await this.decryptEmailOrPassthrough(usuario.email);
     if (!email) {
-      throw new BadRequestException(`User ${username} does not have an email registered.`);
+      throw new BadRequestException(
+        `User ${username} does not have an email registered.`,
+      );
     }
 
     await this.verificationRepo.update(
@@ -71,11 +83,16 @@ export class VerificationCodeService {
     await this.verificationRepo.save(verification);
 
     try {
-      const resendResponse = await this.mailService.sendVerificationCode(email.trim(), code);
+      const resendResponse = await this.mailService.sendVerificationCode(
+        email.trim(),
+        code,
+      );
 
       if (resendResponse.error) {
         this.logger.error(`Resend API Error: ${resendResponse.error.message}`);
-        throw new BadRequestException(`Resend API Error: ${resendResponse.error.message}`);
+        throw new BadRequestException(
+          `Resend API Error: ${resendResponse.error.message}`,
+        );
       }
 
       await this.verificationRepo.update(verification.requestId, {
@@ -89,11 +106,18 @@ export class VerificationCodeService {
         message: 'Verification code sent.',
       };
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
         throw error;
       }
-      this.logger.error(`Failed to send email to user ${username}: ${error.message}`);
-      throw new BadRequestException(error.message || 'Failed to send verification email.');
+      this.logger.error(
+        `Failed to send email to user ${username}: ${error.message}`,
+      );
+      throw new BadRequestException(
+        error.message || 'Failed to send verification email.',
+      );
     }
   }
 
@@ -102,10 +126,15 @@ export class VerificationCodeService {
    */
   async validateCode(dto: ValidateCodeDto): Promise<any> {
     const { tenant, username, code } = dto;
-    this.logger.log(`Validating code for tenant: [${tenant}], user: [${username}]`);
+    this.logger.log(
+      `Validating code for tenant: [${tenant}], user: [${username}]`,
+    );
 
     const tenantEntity = await this.findTenant(tenant);
-    const usuario = await this.findUserByUsernameAndTenant(username, tenantEntity.id);
+    const usuario = await this.findUserByUsernameAndTenant(
+      username,
+      tenantEntity.id,
+    );
 
     const verification = await this.verificationRepo.findOne({
       where: { usuarioId: usuario.id, verificationType: 'PR' },
@@ -113,7 +142,9 @@ export class VerificationCodeService {
     });
 
     if (!verification) {
-      throw new BadRequestException('No verification code found for this user.');
+      throw new BadRequestException(
+        'No verification code found for this user.',
+      );
     }
 
     if (verification.status !== 'E') {
@@ -121,20 +152,33 @@ export class VerificationCodeService {
     }
 
     if (new Date() > verification.expiresAt) {
-      await this.verificationRepo.update(verification.requestId, { status: 'X', updatedBy: 'SYSTEM' });
+      await this.verificationRepo.update(verification.requestId, {
+        status: 'X',
+        updatedBy: 'SYSTEM',
+      });
       throw new BadRequestException('Verification code has expired.');
     }
 
     if (verification.attempts >= verification.maxAttempts) {
-      await this.verificationRepo.update(verification.requestId, { status: 'B', updatedBy: 'SYSTEM' });
+      await this.verificationRepo.update(verification.requestId, {
+        status: 'B',
+        updatedBy: 'SYSTEM',
+      });
       throw new BadRequestException('Too many attempts. Code blocked.');
     }
 
     if (verification.code !== code) {
-      await this.verificationRepo.increment({ requestId: verification.requestId }, 'attempts', 1);
+      await this.verificationRepo.increment(
+        { requestId: verification.requestId },
+        'attempts',
+        1,
+      );
 
       if (verification.attempts + 1 >= verification.maxAttempts) {
-        await this.verificationRepo.update(verification.requestId, { status: 'B', updatedBy: 'SYSTEM' });
+        await this.verificationRepo.update(verification.requestId, {
+          status: 'B',
+          updatedBy: 'SYSTEM',
+        });
       }
 
       throw new BadRequestException('Invalid verification code.');
@@ -155,7 +199,9 @@ export class VerificationCodeService {
 
   private async findTenant(tenant: string): Promise<Tenant> {
     const tenantCode = tenant.trim().toLowerCase();
-    const tenantEntity = await this.tenantRepo.findOne({ where: { nombre: tenantCode } });
+    const tenantEntity = await this.tenantRepo.findOne({
+      where: { nombre: tenantCode },
+    });
 
     if (!tenantEntity) {
       throw new NotFoundException(`Tenant ${tenant} not found.`);
@@ -164,8 +210,12 @@ export class VerificationCodeService {
     return tenantEntity;
   }
 
-  private async findUserByUsernameAndTenant(username: string, tenantId: number): Promise<Usuario> {
-    const usernameHmac = (await this.securityClientService.encrypt(username)).hmac;
+  private async findUserByUsernameAndTenant(
+    username: string,
+    tenantId: number,
+  ): Promise<Usuario> {
+    const usernameHmac = (await this.securityClientService.encrypt(username))
+      .hmac;
     const usuario = await this.usuarioRepo.findOne({
       where: { username_hmac: usernameHmac, tenantId },
     });
@@ -177,7 +227,9 @@ export class VerificationCodeService {
     return usuario;
   }
 
-  private async decryptEmailOrPassthrough(value: string | null): Promise<string | null> {
+  private async decryptEmailOrPassthrough(
+    value: string | null,
+  ): Promise<string | null> {
     if (!value) {
       return null;
     }
