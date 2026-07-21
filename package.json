@@ -39,7 +39,8 @@
       "minimatch": {
         "brace-expansion": "2.1.2"
       }
-    }
+    },
+    "multer": "2.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
